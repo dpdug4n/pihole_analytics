@@ -1,8 +1,13 @@
-import dash
+import dash, logging
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 app = Dash(__name__, use_pages=True,external_stylesheets=[dbc.themes.DARKLY])
+
+server = app.server
 
 SIDEBAR_STYLE = {
     "position": "fixed",
@@ -46,4 +51,4 @@ app.layout = html.Div([
 ])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8686)

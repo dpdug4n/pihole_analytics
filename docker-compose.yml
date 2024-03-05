@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  
+  pihole_analytics:
+    build: 
+      context: ./
+    container_name: pihole_analytics      
+    hostname: "PiHole Analytics"
+    ports:
+      - 8686:8686
+    networks:
+      - pihole_net
+    # command: gunicorn --worker-tmp-dir /dev/shm --workers=4 --threads=4 --worker-class=gthread  -b :8088 pihole_analytics.app:server
+    command: python -m pihole_analytics.app
+    # volumes:
+    #   - ${FTLDNS_PATH}:/etc/pihole/pihole-FTL.db    
+    #   - ./pihole-FTL.db:/etc/pihole/pihole-FTL.db
+networks:
+  pihole_net:
+    driver: bridge

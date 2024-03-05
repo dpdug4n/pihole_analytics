@@ -1,10 +1,11 @@
-import datetime 
+from datetime import datetime 
+import logging 
 
-def convert(date_obj):
-    # Convert the date object to datetime object
-    datetime_obj = datetime.datetime.combine(date_obj, datetime.time.min)
-    
-    # Get the epoch timestamp
-    epoch_timestamp = int(datetime_obj.timestamp())
-    
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+def convert(date_str):
+    logger.debug(f'Converting {date_str} to epoch.')
+    date_object = datetime.strptime(date_str, "%Y-%m-%d")
+    epoch_timestamp = int(date_object.timestamp())
     return epoch_timestamp
