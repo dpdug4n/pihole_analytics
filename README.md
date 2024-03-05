@@ -35,7 +35,7 @@ Currently this is just an exploratory research project, for fun. Feel free to co
  - share button via Dash App State?
  - Prettify table results via workers.result_normalizer
  - Add some form of optional VT|whois|RDAP lookup mechanism
-    - each grid row 
+    - each grid row needs a selector: https://dash.plotly.com/dash-ag-grid/checkbox-row-selection
 - #### References
     - https://dash.plotly.com/urls#example-2:-serializing-the-app-state-in-the-url-hash
 
