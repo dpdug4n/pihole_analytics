@@ -36,6 +36,8 @@ Currently this is just an exploratory research project, for fun. Feel free to co
  - Prettify table results via workers.result_normalizer
  - Add some form of optional VT|whois|RDAP lookup mechanism
     - each grid row needs a selector: https://dash.plotly.com/dash-ag-grid/checkbox-row-selection
+    - https://ipwhois.readthedocs.io/en/latest/README.html
+    - https://virustotal.github.io/vt-py/ 
 - #### References
     - https://dash.plotly.com/urls#example-2:-serializing-the-app-state-in-the-url-hash
 
