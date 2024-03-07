@@ -35,8 +35,7 @@ app.layout = html.Div([
                     href=page["path"],
                     active="exact",
                 )
-                for page in dash.page_registry.values()
-                if page["path"]
+                for page in dash.page_registry.values() if page["location"] == "sidebar"
             ],
             vertical=True,
             pills=True,
