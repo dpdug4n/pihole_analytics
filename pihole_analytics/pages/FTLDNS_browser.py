@@ -29,8 +29,14 @@ dash.register_page(
 )
 
 query_btn = dbc.Button(
-    "Update", 
+    "Query All", 
     id="query-btn",
+    color="primary"
+)
+
+count_btn = dbc.Button(
+    "Count", 
+    id="count-btn",
     color="primary"
 )
 
@@ -64,7 +70,8 @@ def layout():
     [
         dbc.Row([
             dbc.Col(date_range, width="auto"),
-            dbc.Col(query_btn, width="auto")
+            dbc.Col(query_btn, width="auto"),
+            dbc.Col(count_btn,width="auto")
         ], justify="start"),
         grid
     ]
@@ -73,17 +80,24 @@ def layout():
     Output('grid','columnDefs'), 
     Output('grid','rowData'),  
     Input('query-btn','n_clicks'),  
+    Input('count-btn','n_clicks'), 
     State('query-date-range', 'start_date'),
     State('query-date-range', 'end_date'),
     prevent_initial_call=True,
 )
-def update_query_date_range(n_clicks,start_date, end_date):
-    if ctx.triggered_id == 'query-btn' and n_clicks !=0 :
-        start_date_epoch = date_to_epoch.convert(start_date)
-        end_date_epoch = date_to_epoch.convert(end_date)
-        query = f"SELECT * FROM queries WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch}"
-        data = ftldns_worker.Worker().query_to_dataframe(query)
-        data = result_normalizer.normalize(data)
-        columnDefs=[{'field':col,'filter':True, 'sortable':True} for col in data.columns]
-        rowData = data.to_dict("records")
-        return columnDefs, rowData
+def update_query_date_range(qa_clicks,c_clicks, start_date, end_date):
+    start_date_epoch = date_to_epoch.convert(start_date)
+    end_date_epoch = date_to_epoch.convert(end_date)
+    match ctx.triggered_id:
+        case 'query-btn':
+            query = f"SELECT * FROM queries WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch}"
+        case 'count-btn':
+            query = f"""
+                SELECT domain, count(domain), type, status, client, forward, reply_type  FROM queries 
+                WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch} GROUP BY domain ORDER BY count(domain) DESC
+                """
+    data = ftldns_worker.Worker().query_to_dataframe(query)
+    data = result_normalizer.normalize(data)
+    columnDefs=[{'field':col,'filter':True, 'sortable':True} for col in data.columns]
+    rowData = data.to_dict("records")
+    return columnDefs, rowData

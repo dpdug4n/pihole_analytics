@@ -72,7 +72,12 @@ def normalize(data):
     }
 
     for column, mapping in schema.items():
-        data[column] = data[column].map(mapping)
-    data['timestamp'] = pd.to_datetime(data['timestamp'], unit='s')
-    
+        try:
+            data[column] = data[column].map(mapping)
+        except KeyError as expected:
+            continue
+    try:
+        data['timestamp'] = pd.to_datetime(data['timestamp'], unit='s')
+    except KeyError as no_timestamp:
+        pass
     return data
