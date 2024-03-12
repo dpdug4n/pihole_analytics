@@ -1,16 +1,19 @@
-import dash, logging, json
+import dash, logging, os
 import dash_ag_grid as dag
 from dash import html, dcc, Input, State, Output, ctx, callback
 import dash_bootstrap_components as dbc
 
 from datetime import date, timedelta
 
+
 import pihole_analytics.workers.ftldns_worker as ftldns_worker 
 import pihole_analytics.workers.date_to_epoch as date_to_epoch
 import pihole_analytics.workers.result_normalizer as result_normalizer
 
+
 # logging
-logging.basicConfig(level=logging.DEBUG)
+log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 # data
@@ -19,7 +22,7 @@ data = db_worker.query_to_dataframe(db_worker.query)
 data = result_normalizer.normalize(data)
 columnDefs = [{'field':col,'filter':True, 'sortable':True} for col in data.columns]
 
-## UI
+# UI
 dash.register_page(
     __name__,
     name = "FTLDNS Browser",
@@ -40,6 +43,12 @@ count_btn = dbc.Button(
     color="primary"
 )
 
+check_btn = dbc.Button(
+    "VT & RDAP Check", 
+    id="check-btn",
+    color="secondary"
+)
+
 date_range = dcc.DatePickerRange(
     #https://dash.plotly.com/dash-core-components/datepickerrange
     id='query-date-range',
@@ -54,15 +63,22 @@ date_range = dcc.DatePickerRange(
     # style = {'css_hell':'here'}
 )
 
-
 grid = dag.AgGrid(
     #https://dash.plotly.com/dash-ag-grid/getting-started
     id = "grid",
     rowData=data.to_dict("records"),
     columnDefs=columnDefs,
-    dashGridOptions={'pagination':True},#"domLayout":"autoHeight",
+    dashGridOptions={'pagination':True, 'rowSelection':'single'},#"domLayout":"autoHeight",
     # style = {}"
     className="ag-theme-alpine-dark"
+)
+
+vt_rdap_results = html.Div(
+    dcc.Markdown(
+        id='vt-rdap-results',
+        # classname = ''
+    ),
+    # style={}
 )
 
 def layout():
@@ -71,11 +87,16 @@ def layout():
         dbc.Row([
             dbc.Col(date_range, width="auto"),
             dbc.Col(query_btn, width="auto"),
-            dbc.Col(count_btn,width="auto")
+            dbc.Col(count_btn,width="auto"),
+            dbc.Col(check_btn,width="auto")
         ], justify="start"),
-        grid
+        grid,
+        vt_rdap_results
     ]
 )
+
+#callbacks 
+
 @callback(
     Output('grid','columnDefs'), 
     Output('grid','rowData'),  
@@ -90,7 +111,10 @@ def update_query_date_range(qa_clicks,c_clicks, start_date, end_date):
     end_date_epoch = date_to_epoch.convert(end_date)
     match ctx.triggered_id:
         case 'query-btn':
-            query = f"SELECT * FROM queries WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch}"
+            query = f"""
+                SELECT domain, type, status, timestamp, client, forward, additional_info, reply_type, reply_time, dnssec, id FROM queries 
+                WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch}
+                """
         case 'count-btn':
             query = f"""
                 SELECT domain, count(domain), type, status, client, forward, reply_type  FROM queries 
@@ -98,6 +122,28 @@ def update_query_date_range(qa_clicks,c_clicks, start_date, end_date):
                 """
     data = ftldns_worker.Worker().query_to_dataframe(query)
     data = result_normalizer.normalize(data)
-    columnDefs=[{'field':col,'filter':True, 'sortable':True} for col in data.columns]
+    columnDefs=[{'field':col,'filter':True, 'sortable':True, 'checkboxSelection': True} 
+        if col == 'domain' else {'field':col,'filter':True, 'sortable':True} 
+        for col in data.columns] 
+        
     rowData = data.to_dict("records")
     return columnDefs, rowData
+
+@callback(
+    Output('check-btn','color'), 
+    Input('grid','selectedRows'),  
+    prevent_initial_call=True,
+)
+def check_btn_colorizer(row):
+    if not row:
+        return 'secondary'
+    else:
+        return 'primary'
+    
+@callback(
+    Output('vt-rdap-results','children'), 
+    Input('grid','selectedRows'),  
+    prevent_initial_call=True,
+)
+def vt_rdap_check(row):
+    ''

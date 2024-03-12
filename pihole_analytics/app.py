@@ -1,8 +1,14 @@
-import dash, logging
+import dash, logging, os
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
+from dotenv import load_dotenv
 
-logging.basicConfig(level=logging.DEBUG)
+# config/env
+load_dotenv()
+
+# logging
+log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 app = Dash(__name__, use_pages=True,external_stylesheets=[dbc.themes.DARKLY])

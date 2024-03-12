@@ -1,13 +1,18 @@
-import sqlite3, logging
+import sqlite3, logging, os
 import pandas as pd
 
-logging.basicConfig(level=logging.DEBUG)
+# logging
+log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
+logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 class Worker():
     def __init__(self):
         self.FTLDNS_PATH = "./pihole_analytics/pihole-FTL.db"
-        self.query = "SELECT * FROM queries WHERE timestamp = null"
+        self.query = """
+            SELECT domain, type, status, timestamp, client, forward, additional_info, reply_type, reply_time, dnssec, id 
+            FROM queries WHERE timestamp = null
+            """
     def query_to_dataframe(self, query):
         try:
             logger.debug(f'Executing query: {query}')
