@@ -11,7 +11,6 @@ Currently this is just an exploratory research project, for fun. Feel free to co
 # ToDo / Features
 ## Logging
 - add logger to each page/component.
-- env var for setting level
 ## Pages
 ### Analytics Page
 - Accordion|dropdown|or some equivalent for following figures
@@ -30,14 +29,9 @@ Currently this is just an exploratory research project, for fun. Feel free to co
     - https://techfirst.medium.com/correlation-analysis-in-time-series-7c18a88d27a9
 ### FTLDNS Browser Page
  - Fix the Calendar CSS. DARKLY for life.
- - Add input component for custom queries.
+ - Add input component for custom queries?
  - Add buttons for .csv export
  - share button via Dash App State?
- - Prettify table results via workers.result_normalizer
- - Add some form of optional VT|whois|RDAP lookup mechanism
-    - each grid row needs a selector: https://dash.plotly.com/dash-ag-grid/checkbox-row-selection
-    - https://ipwhois.readthedocs.io/en/latest/README.html
-    - https://virustotal.github.io/vt-py/ 
 - #### References
     - https://dash.plotly.com/urls#example-2:-serializing-the-app-state-in-the-url-hash
 
@@ -47,10 +41,10 @@ Currently this is just an exploratory research project, for fun. Feel free to co
     - dash app, pihole
     - dash app, pihole, rProxy, auto certs, gunicorn?
 - Add options for ENV vars to set FTLDNS path.
-- Looks like there may be an issue that stems from reading the db while pihole is running.
-    - COPY statement in the Dockerfile won't work, due to hash of db changing while building image.
-    - Bind mount creates an issue with the container not being able to read from the DB. Possibly a permissions issue?
-    - For now, I just manually copied the pihole-FTL.db into the /pihole_analytics dir for dev. Better workaround would be a bash script to cp the db. Final solution should be able to read directly from the db.
+    - Looks like there may be an issue that stems from reading the db while pihole is running.
+        - COPY statement in the Dockerfile won't work, due to hash of db changing while building image.
+        - Bind mount creates an issue with the container not being able to read from the DB. Possibly a permissions issue?
+        - For now, I just manually copied the pihole-FTL.db into the /pihole_analytics dir for dev. Better workaround would be a bash script to cp the db. Final solution should be able to read directly from the db.
 - #### References
      - https://medium.com/@albertazzir/blazing-fast-python-docker-builds-with-poetry-a78a66f5aed0
     - https://github.com/orgs/python-poetry/discussions/1879
