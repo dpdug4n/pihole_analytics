@@ -1,4 +1,4 @@
-import logging, os, requests, json
+import logging, os, requests
 import pandas as pd
 
 # logging
