@@ -1,4 +1,4 @@
-import dash, logging, os
+import dash, logging, os, asyncio
 import dash_ag_grid as dag
 from dash import html, dcc, Input, State, Output, ctx, callback
 import dash_bootstrap_components as dbc
@@ -9,7 +9,7 @@ from datetime import date, timedelta
 import pihole_analytics.workers.ftldns_worker as ftldns_worker 
 import pihole_analytics.workers.date_to_epoch as date_to_epoch
 import pihole_analytics.workers.result_normalizer as result_normalizer
-
+import pihole_analytics.workers.domain_check as domain_check
 
 # logging
 log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
@@ -27,6 +27,7 @@ dash.register_page(
     __name__,
     name = "FTLDNS Browser",
     title = "FTLDNS Browser",
+    path = '/',
     description = "",
     location = "sidebar"                    
 )
@@ -44,7 +45,7 @@ count_btn = dbc.Button(
 )
 
 check_btn = dbc.Button(
-    "VT & RDAP Check", 
+    "VT Lookup", 
     id="check-btn",
     color="secondary"
 )
@@ -73,10 +74,11 @@ grid = dag.AgGrid(
     className="ag-theme-alpine-dark"
 )
 
-vt_rdap_results = html.Div(
+domain_results = html.Div(
     dcc.Markdown(
-        id='vt-rdap-results',
+        id='domain-check-results',
         # classname = ''
+        children = ''
     ),
     # style={}
 )
@@ -91,7 +93,7 @@ def layout():
             dbc.Col(check_btn,width="auto")
         ], justify="start"),
         grid,
-        vt_rdap_results
+        domain_results
     ]
 )
 
@@ -141,9 +143,13 @@ def check_btn_colorizer(row):
         return 'primary'
     
 @callback(
-    Output('vt-rdap-results','children'), 
-    Input('grid','selectedRows'),  
+    Output('domain-check-results','children'), 
+    State('grid','selectedRows'),  
+    Input('check-btn','n_clicks'),
     prevent_initial_call=True,
 )
-def vt_rdap_check(row):
-    ''
+def check_domain(row, clicks):
+    if ctx.triggered_id == 'check-btn':
+        result = domain_check.domain_lookup(row[0].get('domain'))
+        # logger.debug(result)
+        return result

@@ -12,10 +12,8 @@ dash-ag-grid = "*"
 dash = "2.16.1"
 pandas = "*"
 dash_bootstrap_components = "*"
-dnspython = "*"
-ipwhois = "*"
-vt-py = "*"
 python-dotenv = "*"
+requests = "*"
 
 [build-system]
 requires = ["poetry-core"]
