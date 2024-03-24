@@ -51,7 +51,6 @@ check_btn = dbc.Button(
 )
 
 date_range = dcc.DatePickerRange(
-    #https://dash.plotly.com/dash-core-components/datepickerrange
     id='query-date-range',
     start_date_placeholder_text="Start Period",
     start_date=date.today() - timedelta(weeks=1),
@@ -65,7 +64,6 @@ date_range = dcc.DatePickerRange(
 )
 
 grid = dag.AgGrid(
-    #https://dash.plotly.com/dash-ag-grid/getting-started
     id = "grid",
     rowData=data.to_dict("records"),
     columnDefs=columnDefs,
@@ -75,17 +73,21 @@ grid = dag.AgGrid(
 )
 
 domain_results = html.Div(
-    dcc.Markdown(
-        id='domain-check-results',
-        # classname = ''
-        children = ''
-    ),
-    # style={}
+    dbc.Offcanvas(
+        dcc.Markdown(
+            id='domain-check-results',
+            # classname = ''
+            children = ''
+        ),
+        id = 'offcanvas-domain-results',
+        title='Domain Results',
+        is_open=False,
+        placement='end'
+    )
 )
 
 def layout():
-    return html.Div(
-    [
+    return html.Div([
         dbc.Row([
             dbc.Col(date_range, width="auto"),
             dbc.Col(query_btn, width="auto"),
@@ -94,8 +96,7 @@ def layout():
         ], justify="start"),
         grid,
         domain_results
-    ]
-)
+    ])
 
 #callbacks 
 
@@ -153,3 +154,13 @@ def check_domain(row, clicks):
         result = domain_check.domain_lookup(row[0].get('domain'))
         # logger.debug(result)
         return result
+
+@callback(
+    Output('offcanvas-domain-results', 'is_open'),
+    Input('check-btn','n_clicks'),
+    State('offcanvas-domain-results', 'is_open')
+)
+def toggle_offcanvas(clicks, is_open):
+    if clicks:
+        return not is_open
+    return is_open

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "pihole-analytics"
 version = "0.1.0"
-description = "Advanced Analytics for PiHole's FTLDNS "
+description = "Advanced Analytics for PiHole's FTLDNS"
 authors = ["Patrick Dugan dpdug4n@gmail.com"]
 readme = "README.md"
 package-mode = false
@@ -14,6 +14,7 @@ pandas = "*"
 dash_bootstrap_components = "*"
 python-dotenv = "*"
 requests = "*"
+scipy = "*"
 
 [build-system]
 requires = ["poetry-core"]
