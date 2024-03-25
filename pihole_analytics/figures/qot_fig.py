@@ -35,7 +35,6 @@ def generate(data):
         }
 
         fig = px.bar(data_grouped,
-            title='Doman Queries Over Time',
             x='timestamp', 
             y='count', 
             color='status',
