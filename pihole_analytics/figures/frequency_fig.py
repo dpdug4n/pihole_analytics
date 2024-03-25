@@ -9,10 +9,10 @@ logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 # Work in progress
-def generate_frequency_fig(data):
+def generate(data):
     try:
         logger.debug('Generating frequency fig')
-        fig = px.line()
+        fig = px.line(template='plotly_dark')
         return fig
     
     except Exception as error:

@@ -19,6 +19,7 @@ class Worker():
             self.conn = sqlite3.connect(self.FTLDNS_PATH)
             self.df = pd.read_sql_query(query, self.conn)
             self.conn.close()  
+            logger.debug(f"Query Results:\n{self.df}")
             return self.df
         except sqlite3.Error as e:
             logger.error("Error querying data:", e)

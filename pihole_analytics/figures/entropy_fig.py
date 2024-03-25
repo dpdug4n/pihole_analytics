@@ -10,10 +10,10 @@ logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
 # Work in progress
-def generate_entropy_fig(data):
+def generate(data):
     try:
         logger.debug('Generating entropy fig')
-        fig = px.line()
+        fig = px.line(template='plotly_dark')
         return fig
     
     except Exception as error:
