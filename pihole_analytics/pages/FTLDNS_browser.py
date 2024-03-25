@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # data
 db_worker = ftldns_worker.Worker()
 data = db_worker.query_to_dataframe(db_worker.query)
-data = result_formatter.normalize(data)
+data = result_formatter.format(data)
 columnDefs = [{'field':col,'filter':True, 'sortable':True} for col in data.columns]
 
 # UI
