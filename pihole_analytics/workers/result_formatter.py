@@ -6,7 +6,7 @@ import pandas as pd
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-def normalize(data):
+def format(data):
     schema = {
         'type':{
             1:"A",

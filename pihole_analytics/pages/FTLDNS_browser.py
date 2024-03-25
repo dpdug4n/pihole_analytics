@@ -8,7 +8,7 @@ from datetime import date, timedelta
 
 import pihole_analytics.workers.ftldns_worker as ftldns_worker 
 import pihole_analytics.workers.date_to_epoch as date_to_epoch
-import pihole_analytics.workers.result_normalizer as result_normalizer
+import pihole_analytics.workers.result_formatter as result_formatter
 import pihole_analytics.workers.domain_check as domain_check
 
 # logging
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # data
 db_worker = ftldns_worker.Worker()
 data = db_worker.query_to_dataframe(db_worker.query)
-data = result_normalizer.normalize(data)
+data = result_formatter.normalize(data)
 columnDefs = [{'field':col,'filter':True, 'sortable':True} for col in data.columns]
 
 # UI
@@ -124,7 +124,7 @@ def update_query_date_range(qa_clicks,c_clicks, start_date, end_date):
                 WHERE timestamp BETWEEN {start_date_epoch} and {end_date_epoch} GROUP BY domain ORDER BY count(domain) DESC
                 """
     data = ftldns_worker.Worker().query_to_dataframe(query)
-    data = result_normalizer.normalize(data)
+    data = result_formatter.format(data)
     columnDefs=[{'field':col,'filter':True, 'sortable':True, 'checkboxSelection': True} 
         if col == 'domain' else {'field':col,'filter':True, 'sortable':True} 
         for col in data.columns] 

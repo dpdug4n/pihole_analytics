@@ -3,7 +3,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import os, logging
 
-import pihole_analytics.workers.result_normalizer as result_normalizer
+import pihole_analytics.workers.result_formatter as result_formatter
 # logging
 log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
 logging.basicConfig(level=log_level)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def generate(data):
     try:
-        data = result_normalizer.normalize(data)
+        data = result_formatter.format(data)
         floor_to_hour = lambda x: x.replace(minute=0, second=0, microsecond=0)
         data.timestamp = data.timestamp.apply(floor_to_hour)
         data_grouped = data.groupby(['timestamp', 'domain','status']).size().reset_index(name='count')
