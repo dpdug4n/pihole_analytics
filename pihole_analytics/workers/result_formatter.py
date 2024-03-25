@@ -36,7 +36,7 @@ def format(data):
             6:"Blocked: By upstream server (known blocking page IP address)",
             7:"Blocked: By upstream server (0.0.0.0 or ::)",
             8:"Blocked: By upstream server (NXDOMAIN with RA bit unset)",
-            9:"Blocked:Domain contained in gravity database.",
+            9:"Blocked: Domain contained in gravity database",
             10:"Blocked: Domain matched by a regex blacklist filter.",
             11:"Blocked: Domain contained in exact blacklist",
             12:"Allowed: Retried query",
