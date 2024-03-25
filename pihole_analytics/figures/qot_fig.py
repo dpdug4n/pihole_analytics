@@ -43,7 +43,7 @@ def generate(data):
             y='count', 
             color='status',
             barmode='stack',
-            labels={'count': 'Domain Count', 'timestamp':'Time'},
+            labels={'count': 'Domain Count', 'timestamp':'Date'},
             hover_data={'timestamp': '|%B %d, %Y %H:00', 'domain': True, 'status': True, 'count': True},
             color_discrete_map=color_mapping,
             template='plotly_dark')
