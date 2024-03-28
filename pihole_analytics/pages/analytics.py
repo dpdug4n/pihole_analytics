@@ -87,13 +87,13 @@ def switch_tab(start_date, end_date, active_tab):
     domains = ftldns_worker.Worker().query_to_dataframe(f"""
         SELECT DISTINCT domain FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}  
     """)
+    domain_table.rowData = domains.to_dict("records")
     data = ftldns_worker.Worker().query_to_dataframe(f"""
         SELECT domain, timestamp, status  FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}  
     """)
 
     match active_tab:
         case 'frequency-tab':            
-            domain_table.rowData = domains.to_dict("records")
             fig.figure = frequency_fig.generate(data)
             tab_content = html.Div([
                 fig,
@@ -105,7 +105,6 @@ def switch_tab(start_date, end_date, active_tab):
             return tab_content
 
         case 'entropy-tab':
-            domain_table.rowData = domains.to_dict("records")
             fig.figure = entropy_fig.generate(data)
             tab_content = html.Div([
                 fig,
@@ -117,7 +116,6 @@ def switch_tab(start_date, end_date, active_tab):
             return tab_content
         
         case 'qot-tab':
-            domain_table.rowData = domains.to_dict("records")
             fig.figure = qot_fig.generate(data)
             tab_content = html.Div([
                 fig,
