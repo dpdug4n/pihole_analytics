@@ -11,7 +11,9 @@ log_level = logging.getLevelName(os.getenv('LOG_LEVEL'))
 logging.basicConfig(level=log_level)
 logger = logging.getLogger(__name__)
 
-app = Dash(__name__, use_pages=True,external_stylesheets=[dbc.themes.DARKLY])
+app = Dash(__name__, use_pages=True,
+    suppress_callback_exceptions=True,
+    external_stylesheets=[dbc.themes.DARKLY])
 
 server = app.server
 

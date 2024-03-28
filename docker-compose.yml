@@ -17,4 +17,6 @@ services:
     #   - ./pihole-FTL.db:/etc/pihole/pihole-FTL.db
 networks:
   pihole_net:
-    driver: bridge
+    driver: macvlan
+    driver_opts:
+      parent: eth0

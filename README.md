@@ -14,7 +14,6 @@ Currently this is just an exploratory research project, for fun. Feel free to co
 ## Pages
 ### Analytics Page
 - Accordion|dropdown|or some equivalent for following figures
-    - baseline of count/minute, toggleable threshold, capture spikes per endpoint
     - uncommon DNS queries
     - baseline of registry date for frequented domains, capture queries outside of threshold.
     - entropy analysis 

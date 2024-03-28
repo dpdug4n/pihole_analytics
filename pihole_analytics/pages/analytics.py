@@ -1,4 +1,5 @@
 import dash, logging, os
+import dash_ag_grid as dag
 from dash import html, dcc, Input, State, Output, ctx, callback
 import dash_bootstrap_components as dbc
 
@@ -50,6 +51,18 @@ tabs = dbc.Tabs(
     id = "tabs"
 )
 
+domain_table = dag.AgGrid(
+    id='domain-table',
+    rowData = {},
+    columnDefs=[{'headerName':'Domain Filter','field':'domain','filter':True, 
+        'checkboxSelection': True,"resizable": False}],
+    columnSize="sizeToFit",
+    dashGridOptions={'rowSelection':'single'},
+    className="ag-theme-alpine-dark"
+)
+
+fig = dcc.Graph(id = 'fig')
+
 def layout():
     return html.Div([
         dbc.Row([
@@ -65,51 +78,85 @@ def layout():
     Output('tab-content', 'children'),
     Input('query-date-range', 'start_date'),
     Input('query-date-range', 'end_date'),
-    Input("tabs","active_tab"),
+    Input('tabs','active_tab'),
     prevent_initial_call=True
 )
-def switch_tab(start_date, end_date, active_tab,):
+def switch_tab(start_date, end_date, active_tab):
     start_date = date_to_epoch.convert(start_date)
     end_date = date_to_epoch.convert(end_date)
+    domains = ftldns_worker.Worker().query_to_dataframe(f"""
+        SELECT DISTINCT domain FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}  
+    """)
     data = ftldns_worker.Worker().query_to_dataframe(f"""
         SELECT domain, timestamp, status  FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}  
     """)
+
     match active_tab:
-        case 'frequency-tab':
-            # domains = ftldns_worker.Worker().query_to_dataframe(
-            #     "SELECT DISTINCT domain FROM queries")['domain'].tolist()
-            # domain_dropdown = dbc.DropdownMenu(id="domain-dropdown",
-            #     menu_variant="dark",
-            #     label="Domains",
-            #     children = [ 
-            #         dbc.DropdownMenuItem(f"{domain}",id = f"{domain}-btn")        
-            #         for domain in domains
-            #     ],
-            #     style = {"max-height":"400px"}                             
-            # )
-            
+        case 'frequency-tab':            
+            domain_table.rowData = domains.to_dict("records")
+            fig.figure = frequency_fig.generate(data)
             tab_content = html.Div([
-                dcc.Graph(
-                    id = 'frequency-fig',
-                    figure = frequency_fig.generate(data)
-                )
+                fig,
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(domain_table, width=3)
+                ]) 
             ])
             return tab_content
 
         case 'entropy-tab':
+            domain_table.rowData = domains.to_dict("records")
+            fig.figure = entropy_fig.generate(data)
             tab_content = html.Div([
-                dcc.Graph(
-                    id = 'entropy-fig',
-                    figure = entropy_fig.generate(data)
-                )
+                fig,
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(domain_table, width=3)
+                ]) 
             ])
             return tab_content
         
         case 'qot-tab':
+            domain_table.rowData = domains.to_dict("records")
+            fig.figure = qot_fig.generate(data)
             tab_content = html.Div([
-                dcc.Graph(
-                    id = 'qot-fig',
-                    figure = qot_fig.generate(data)
-                )
+                fig,
+                html.Br(),
+                dbc.Row([
+                    dbc.Col(domain_table, width=3)
+                ]) 
             ])
             return tab_content
+
+@callback(
+    Output('fig','figure'),
+    State('tabs','active_tab'),
+    Input('query-date-range', 'start_date'),
+    Input('query-date-range', 'end_date'),
+    Input('domain-table', 'selectedRows'),
+    prevent_initial_call=True
+)
+def update_figure(active_tab,start_date,end_date,row):
+    start_date = date_to_epoch.convert(start_date)
+    end_date = date_to_epoch.convert(end_date)
+    if row:
+        domain_filter = row[0].get('domain')
+        data = ftldns_worker.Worker().query_to_dataframe(f"""
+            SELECT domain, timestamp, status  FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}
+            AND domain = "{domain_filter}"
+        """)
+    else:
+        data = ftldns_worker.Worker().query_to_dataframe(f"""
+            SELECT domain, timestamp, status  FROM queries WHERE timestamp BETWEEN {start_date} AND {end_date}  
+        """)
+    match active_tab:
+        case 'frequency-tab':            
+            figure = frequency_fig.generate(data)
+            return figure
+        case 'entropy-tab':
+            figure = entropy_fig.generate(data)
+            return figure  
+        case 'qot-tab':
+            figure = qot_fig.generate(data)
+            return figure
+
