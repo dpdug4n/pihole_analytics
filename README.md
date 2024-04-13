@@ -1,4 +1,6 @@
 # PiHole Analytics
+## Note
+Been busy with outdoor & home projects. Resuming this at a later date
 ## About
 PiHole is great, but the UI's analytic capability can be a tad lacking. This project aims to provide advanced analytics on PiHole's underlying database. 
 
@@ -43,7 +45,7 @@ Currently this is just an exploratory research project, for fun. Feel free to co
     - Looks like there may be an issue that stems from reading the db while pihole is running.
         - COPY statement in the Dockerfile won't work, due to hash of db changing while building image.
         - Bind mount creates an issue with the container not being able to read from the DB. Possibly a permissions issue?
-        - For now, I just manually copied the pihole-FTL.db into the /pihole_analytics dir for dev. Better workaround would be a bash script to cp the db. Final solution should be able to read directly from the db.
+        - For now, just copy the pihole-FTL.db into the /pihole_analytics dir for dev.
 - #### References
      - https://medium.com/@albertazzir/blazing-fast-python-docker-builds-with-poetry-a78a66f5aed0
     - https://github.com/orgs/python-poetry/discussions/1879
